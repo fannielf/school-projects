@@ -14,19 +14,16 @@ import (
 func getInt(s string) int {
 
 	num := 1
-	if s[len(s)-1] == ')' {
-		re := regexp.MustCompile(`^\d+`)
 
-		match := re.FindString(s)
-		if match != "" {
-			number, err := strconv.Atoi(match)
-			if err != nil {
-				fmt.Println("Error:", err)
-				os.Exit(1)
-			}
-			num = number
-		}
+	re := regexp.MustCompile(`\d+`)
+
+	match := re.FindString(s)
+	if match != "" {
+		number, _ := strconv.Atoi(match)
+
+		num = number
 	}
+
 	return num
 }
 
@@ -94,33 +91,27 @@ func fixCase(s string) string {
 	regex := regexp.MustCompile(`\([^()]*\)|[^()\s]+`)
 	slice := regex.FindAllString(s, -1)
 
-
 	re := regexp.MustCompile(`\((cap|up|low)`)
 
 	for i := 0; i < len(slice); i++ {
 		if re.MatchString(strings.ToLower(slice[i])) {
-			lastIndex := len(slice[i]) - 1
-			keyWord := slice[i][1:lastIndex]
+			keyWord := re.FindString(strings.ToLower(slice[i]))
 			num := getInt(slice[i])
 			if i > 0 {
 				for j := num; j > 0; j-- {
 					wordToMod := slice[i-j]
 					switch keyWord {
-					case "cap":
+					case "(cap":
 						wordToMod = strings.ToUpper(wordToMod[:1]) + wordToMod[1:]
-					case "up":
+					case "(up":
 						wordToMod = strings.ToUpper(wordToMod)
-					case "low":
+					case "(low":
 						wordToMod = strings.ToLower(wordToMod)
 					}
 					slice[i-j] = wordToMod
 				}
 			}
-			if re.MatchString(slice[i]) && num == 1 {
-				slice = append(slice[:i], slice[i+1:]...)
-			} else {
-				slice = append(slice[:i], slice[i+2:]...)
-			}
+			slice = append(slice[:i], slice[i+1:]...)
 			i--
 		}
 	}
