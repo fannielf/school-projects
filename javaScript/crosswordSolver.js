@@ -26,7 +26,7 @@ const crosswordSolver = (emptyPuzzle, words) => {
   
     // Check string characters and empty string
     if (!/^[.\n012]+$/.test(emptyPuzzle)) {
-        console.log('Error');
+        console.log('Error here');
         return;
     }
 
@@ -81,7 +81,9 @@ const crosswordSolver = (emptyPuzzle, words) => {
   
       // Exit function if all words have been placed
         if (index === words.length) {
+            if (!gridHasNumbers(grid)) {
             solutions.push(grid.map(row => row.join('')).join('\n'));
+            }
             return;
         }
   
@@ -166,23 +168,54 @@ const crosswordSolver = (emptyPuzzle, words) => {
 
     solve(0);
 
-    const validSolutions = [];
+    // const validSolutions = [];
 
-    // Filter only valid solutions
-    for (let i = 0; i < solutions.length; i++) {
-        const solution = solutions[i];
-        const solutionGrid = solution.split('\n').map(row => row.split(''));
-        const hasNumbers = gridHasNumbers(solutionGrid);
+    // // Filter only valid solutions
+    // for (let i = 0; i < solutions.length; i++) {
+    //     const solution = solutions[i];
+    //     const solutionGrid = solution.split('\n').map(row => row.split(''));
+    //     const hasNumbers = gridHasNumbers(solutionGrid);
 
-        if (!hasNumbers) {
-            validSolutions.push(solution);
-        }
-    }
+    //     if (!hasNumbers) {
+    //         validSolutions.push(solution);
+    //     }
+    // }
 
     // Attempt to solve the puzzle and output result
-    if (validSolutions.length === 1) {
-        console.log(validSolutions[0]);
+    if (solutions.length === 1) {
+        console.log(solutions[0]);
     } else {
-        console.log('Error');
+        console.log('Error in the end');
     }
   }
+
+  const puzzle = `...1...........
+..1000001000...
+...0....0......
+.1......0...1..
+.0....100000000
+100000..0...0..
+.0.....1001000.
+.0.1....0.0....
+.10000000.0....
+.0.0......0....
+.0.0.....100...
+...0......0....
+..........0....`
+
+  const words = [
+    'sun',
+    'sunglasses',
+    'suncream',
+    'swimming',
+    'bikini',
+    'beach',
+    'icecream',
+    'tan',
+    'deckchair',
+    'sand',
+    'seaside',
+    'sandals',
+  ]
+
+crosswordSolver(puzzle, words)
