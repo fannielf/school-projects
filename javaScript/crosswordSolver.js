@@ -57,8 +57,8 @@ const crosswordSolver = (emptyPuzzle, words) => {
                     while (i < width && (grid[r][i] === '0' || grid[r][i] === '1' || grid[r][i] === '2')) {
                         i++;
                     }
-                    if (i - c >= shortest) { 
-                        startingPoints.push({ row: r, col: c, direction: 'h' });
+                    if (i > 2) { 
+                        startingPoints.push({ row: r, col: c, len: i-1, direction: 'h' });
                     }
                 }
                 // Check vertically
@@ -67,8 +67,8 @@ const crosswordSolver = (emptyPuzzle, words) => {
                     while (j < height && (grid[j][c] === '0' || grid[j][c] === '1' || grid[j][c] === '2')) {
                         j++;
                     }
-                    if (j - r >= shortest) { 
-                        startingPoints.push({ row: r, col: c, direction: 'v' });
+                    if (j > 2) { 
+                        startingPoints.push({ row: r, col: c, len: j-r, direction: 'v' });
                     }
                 }
             }
@@ -98,7 +98,6 @@ const crosswordSolver = (emptyPuzzle, words) => {
             }
         }
   
-        return false;
     }
   
     // Check if a word can be placed at the given start position
