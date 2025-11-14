@@ -1,0 +1,91 @@
+"use client";
+import { useState, useEffect } from "react";
+
+export default function CreateEvent({ onClose, onSuccess }) {
+  const [groupId, setGroupId] = useState(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("group_id");
+    setGroupId(id ? Number(id) : null); // Convert to number or set to null if not present
+  }, []);
+
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [date, setDate] = useState("");
+
+  async function handleNewEvent(e) {
+    e.preventDefault();
+    if (!name.trim() || !description.trim() || !date) return;
+
+    const res = await fetch("http://localhost:8080/api/create-event", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: name,
+        description,
+        event_date: date,
+        group: { group_id: groupId },
+      }),
+    });
+
+    if (res.ok) {
+      onSuccess && onSuccess();
+      onClose && onClose();
+    } else {
+      const err = await res.json();
+      console.error("CreateEvent failed:", err.message);
+    }
+  }
+
+  return (
+    <form
+      onSubmit={handleNewEvent}
+      className="max-w-full mx-0 mt-1 p-2 p-4 rounded shadow border border-gray-200"
+    >
+      <label className="block mb-4">
+        <input
+          type="text"
+          placeholder="Event Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          maxLength={50}
+          className="mt-1 block w-full border border-gray-300 rounded p-2"
+        />
+      </label>
+
+      <label className="block mb-4">
+        <textarea
+          placeholder="Event Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+          maxLength={800}
+          className="mt-1 block w-full border border-gray-300 rounded p-2 h-24 resize-none"
+        />
+      </label>
+
+      <label className="block mb-4">
+        <input
+          type="datetime-local"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          required
+          min={new Date().toISOString().slice(0, 16)}
+          className="mt-1 block w-full border border-gray-300 rounded p-2"
+        />
+      </label>
+
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          className="bg-sky-600/60 hover:bg-sky-700/60 text-white font-bold rounded text-md my-2 mr-2 p-2 px-4 cursor-pointer"
+        >
+          Submit
+        </button>
+      </div>
+    </form>
+  );
+}

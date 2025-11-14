@@ -1,0 +1,4 @@
+.DS_Store
+*.db
+backend/database.db
+uploads/

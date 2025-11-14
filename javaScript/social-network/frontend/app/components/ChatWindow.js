@@ -1,0 +1,329 @@
+"use client";
+import { useEffect, useState, useRef } from "react";
+import EmojiPicker from "emoji-picker-react";
+import { sendMessage, addMessageHandler } from "./ws";
+import Author from "./Author";
+import GroupAvatar from "./GroupAvatar";
+
+export default function ChatWindow({
+  chatPartner,
+  group,
+  onClose,
+  isGroupChat,
+  currentUser,
+}) {
+  const [messages, setMessages] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingUser, setTypingUser] = useState(null);
+  const [input, setInput] = useState("");
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [canWrite, setCanWrite] = useState(true); // New state to control write access
+  const typingTimeoutRef = useRef(null);
+  const lastSentTypingRef = useRef(0);
+  const messagesRef = useRef(null);
+
+  if (isGroupChat) {
+    if (!group || !group.group_id) return null;
+  } else {
+    if (!chatPartner || !chatPartner.user_id) return null;
+  }
+
+  function handleEmojiClick(emojiData) {
+    setInput(input + emojiData.emoji);
+    setShowEmoji(false);
+  }
+  function formatTimestamp(timestamp) {
+    // use en-GB format
+    return new Date(timestamp).toLocaleTimeString(['en-GB'], {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+      timeZone: "UTC",
+    });
+  }
+  useEffect(() => {
+    setMessages([]); // Reset messages when chat partner changes
+
+    if (isGroupChat) {
+      // Fetch group chat history
+      setMessages([]); // Reset messages for group chat
+      sendMessage({
+        type: "chat",
+        group_id: group.group_id,
+        receiver: { user_id: 0 }, // Include chat partner for group context
+      });
+    } else {
+      // Fetch private chat history
+      setMessages([]); // Reset messages for private chat
+      sendMessage({
+        type: "chat",
+        receiver: { user_id: chatPartner.user_id },
+        group_id: 0,
+      });
+    }
+  
+    const removeHandler = addMessageHandler((data) => {
+      // For group chats, only accept messages from the current group
+      if (isGroupChat) {
+        if (data.group_id !== group.group_id) return;
+      } else {
+        // For direct messages, reject any group messages
+        if (data.group_id && data.group_id !== 0) return;
+      }
+      if (data.type === "message") {
+        const timeString = formatTimestamp(data.created_at);
+         
+        let nickname =
+          data.sender.nickname || data.sender.first_name || "Unknown User";
+
+        const incomingMsg = {
+          id: Date.now(),
+          senderId: data.sender.user_id,
+          senderName: nickname,
+          timestamp: timeString,
+          content: data.content,
+        };
+
+        setMessages((msgs) => [...msgs, incomingMsg]);
+      } else if (data.type === "chat") {
+        const formattedMessages = data.history.map((msg, index) => ({
+          id: msg.id || `${msg.sender.user_id}-${msg.created_at}-${index}`,
+          senderId: msg.sender.user_id,
+          senderName:
+            msg.sender.nickname || msg.sender.first_name || "Unknown User",
+          timestamp: formatTimestamp(msg.created_at),
+          
+          content: msg.content,
+        }));
+        setCanWrite(data?.can_message); // Update write access based on server response
+        setMessages(formattedMessages);
+      } else if (data.type === "typing") {
+        if (isGroupChat) {
+          // Handle typing indicator for group chats
+          if (data.sender.user_id !== currentUser) {
+            setIsTyping(true);
+            setTypingUser(data.sender);
+          }
+        } else {
+          // Handle typing indicator for private chats
+          if (data.sender.user_id === chatPartner.user_id) {
+            setIsTyping(true);
+            setTypingUser(data.sender);
+          }
+        }
+      } else if (data.type === "stop_typing") {
+        if (isGroupChat) {
+          // Handle stop typing indicator for group chats
+          if (data.sender.user_id !== currentUser) {
+            setIsTyping(false);
+            setTypingUser(null);
+          }
+        } else {
+          // Handle stop typing indicator for private chats
+          if (data.sender.user_id === chatPartner.user_id) {
+            setIsTyping(false);
+            setTypingUser(null);
+          }
+        }
+      }
+    });
+    
+    return () => {
+      if (removeHandler) removeHandler();
+    };
+  }, [isGroupChat, group?.group_id, chatPartner?.user_id, currentUser]);
+
+  useEffect(() => {
+    if (messagesRef.current) {
+      messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  function handleSend() {
+    if (!input.trim()) return;
+
+    if (isGroupChat) {
+      sendMessage({
+        type: "message",
+        content: input,
+        group_id: group.group_id,
+      });
+    } else {
+      sendMessage({
+        type: "message",
+        content: input,
+        receiver: {
+          user_id: chatPartner.user_id,
+        },
+      });
+    }
+    if (isGroupChat) {
+      sendMessage({
+        type: "stopTypingBE",
+        group_id: group.group_id,
+      });
+    } else {
+      sendMessage({
+        type: "stopTypingBE",
+        receiver: { user_id: chatPartner.user_id },
+      });
+    }
+
+    setInput("");
+  }
+
+  return (
+    <div className="fixed bottom-4 right-4 z-50 border border-gray-300 rounded-lg shadow-lg">
+      <div className="bg-white w-80 h-[40vh] p-3 flex flex-col rounded-lg shadow-lg overflow-hidden">
+        <header className="flex justify-between items-center p-2 border-b border-gray-300">
+          {isGroupChat ? (
+            <GroupAvatar group={group} disableLink={true} size="sm" />
+          ) : (
+            <Author author={chatPartner} disableLink={true} size="sm" />
+          )}
+          <button onClick={onClose} className="text-xl leading-none">
+            &times;
+          </button>
+        </header>
+
+        <div
+          ref={messagesRef}
+          className="flex-1 p-2 flex flex-col space-y-2 overflow-y-auto break-words"
+        >
+          {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`flex flex-col ${
+                msg.senderId === currentUser ? "items-end" : "items-start"
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-semibold">
+                  {msg.senderName || "Unknown"}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {msg.timestamp || ""}
+                </span>
+              </div>
+              <div
+                className={`mt-1 inline-block bg-gray-200 px-3 py-2 rounded-lg max-w-[50%]
+                  ${
+                    msg.senderId === currentUser
+                      ? "rounded-br-none"
+                      : "rounded-bl-none"
+                  }`}
+              >
+                {msg.content}
+              </div>
+            </div>
+          ))}
+        </div>
+        {isTyping && (
+          <div className="text-gray-500 text-sm italic mt-2 flex items-center">
+            <span>
+              {isGroupChat
+                ? `${
+                    typingUser?.nickname ||
+                    typingUser?.first_name ||
+                    typingUser?.user_id ||
+                    "Someone"
+                  } `
+                : `${
+                    chatPartner?.nickname || chatPartner?.first_name || "User"
+                  } `}
+            </span>
+            <span className="ml-2 flex space-x-1 self-center">
+              <span className="w-1 h-1 bg-gray-500 rounded-full animate-bounce-dot"></span>
+              <span className="w-1 h-1 bg-gray-500 rounded-full animate-bounce-dot delay-150"></span>
+              <span className="w-1 h-1 bg-gray-500 rounded-full animate-bounce-dot delay-300"></span>
+            </span>
+          </div>
+        )}
+
+        <footer className="pt-4 pb-2 border-t border-gray-300 flex items-center space-x-2">
+          <button
+            type="button"
+            className="text-xl mr-2 "
+            onClick={() => setShowEmoji((v) => !v)}
+          >
+            😊
+          </button>
+          {showEmoji && (
+            <div className="absolute bottom-16 right-4 z-50">
+              <EmojiPicker onEmojiClick={handleEmojiClick} />
+            </div>
+          )}
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => {
+              if (!canWrite) return; // Prevent typing if user cannot write
+              setInput(e.target.value);
+
+              // if (canWrite) {
+              const now = Date.now();
+              if (now - lastSentTypingRef.current > 1000) {
+                if (isGroupChat) {
+                  sendMessage({
+                    type: "typingBE",
+                    group_id: group.group_id, // Send typing event to group
+                  });
+                } else {
+                  sendMessage({
+                    type: "typingBE",
+                    receiver: { user_id: chatPartner.user_id }, // Send typing event to private chat
+                  });
+                }
+                lastSentTypingRef.current = now;
+              }
+              // }
+
+              if (typingTimeoutRef.current)
+                clearTimeout(typingTimeoutRef.current);
+              typingTimeoutRef.current = setTimeout(() => {
+                if (isGroupChat) {
+                  sendMessage({
+                    type: "stopTypingBE",
+                    group_id: group.group_id, // Stop typing event for group
+                  });
+                } else {
+                  sendMessage({
+                    type: "stopTypingBE",
+                    receiver: { user_id: chatPartner.user_id }, // Stop typing event for private chat
+                  });
+                }
+              }, 2000); // Typing indicator stays for 2 seconds after typing stops
+            }}
+            onKeyDown={(e) => {
+              if (!canWrite) {
+                e.preventDefault();
+                return; // Prevent sending if user cannot write
+              }
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            className="flex-1 border border-gray-300 rounded px-2 py-1 mr-2"
+            placeholder={
+              canWrite ? "Type a message…" : "Follow the user to chat"
+            }
+            disabled={!canWrite} // Disable input if user cannot write
+            maxLength={200}
+          />
+          <button
+            onClick={handleSend}
+            className="px-3 bg-sky-600/60 hover:bg-sky-700/60 text-white px-2 py-1 rounded text-md"
+            disabled={!canWrite} // Disable button if user cannot write
+          >
+            Send
+          </button>
+        </footer>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,29 @@
+package models
+
+import (
+	"sync"
+
+	"github.com/gorilla/websocket"
+)
+
+// * -- Chat structs --*
+type ChatMessage struct {
+	Type           string        `json:"type"`            // "chat", "message", "update_users"
+	Sender         User          `json:"sender"`          // Sender
+	Receiver       User          `json:"receiver"`        // Receiver
+	MessageID      int           `json:"message_id"`      // Message ID
+	GroupID        int           `json:"group_id"`        // Group ID
+	CreatedAt      string        `json:"created_at"`      // Timestamp for the message
+	Content        string        `json:"content"`         // Chat message
+	IsRead         bool          `json:"is_read"`         // If the message is read
+	Users          []User        `json:"users"`           // sorted users for chatBar with userID and username
+	Groups         []Group       `json:"groups"`          // Groups for chatBar with groupID and groupName
+	History        []ChatMessage `json:"history"`         // Message history
+	NotificationID int           `json:"notification_id"` // Notification ID
+	CanMessage     bool          `json:"can_message"`     // If the user can message the receiver
+}
+
+type Client struct {
+	Conn *websocket.Conn
+	Mu   sync.Mutex
+}
