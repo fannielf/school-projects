@@ -11,8 +11,6 @@ First project I have ever coded! The project is simple low level code to learn h
 
 ### lem-in
 
-### real-time-forum
-
 ## JavaScript
 
 ### sortable
@@ -22,6 +20,8 @@ First javaScript project done during the first week of learning JS, done togethe
 ### make-your-game
 
 ### social-network
+
+This project started as a go-project for a simple forum and have been transforming since. First we had to add websockets for real time chat and in our JS-module it became our first time using frameworks (Next.js). As our last JS module project we (project group of 6 people) developed it even further into a facebook-like social platform with follow/unfollow functionality, groups (including events and group chats) and emoji support.
 
 ### bomberman-dom
 
