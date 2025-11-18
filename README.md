@@ -27,6 +27,4 @@ This project started as a go-project for a simple forum and have been transformi
 
 ## Java
 
-### buy-01
-
-Our whole Java module is based on this first project, so we needed to make it scalable. First phase includes implementing backend with microservices, discovery, gateway and kafka. The project runs from Docker. 
+Coming soon

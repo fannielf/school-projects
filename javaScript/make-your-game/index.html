@@ -1,0 +1,74 @@
+<!DOCTYPE html> 
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Pac-man</title>
+        <link rel="stylesheet" href="style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- <script src="gameBoard.js" type="module"></script>
+        <script src="pac-man.js" type="module"></script>
+        <script src="ghosts.js" type="module"></script>
+        <script src="scoring.js" type="module"></script>
+        <script src="gameState.js" type="module"></script> -->
+        <script src="app.js" type="module"></script>
+        <link rel="icon" type="image/png" href="/images/pacman-right.png">
+    </head>
+    <header>
+    </header>
+    <body>
+        <div class="instructions"> Press "i" for instructions</div>
+        <div class="grid"></div>
+        <div class="game-info">
+        <h3>Score: <span id="score"></span></h3>
+        <div id="timer">Time: 0s</div>
+        <div id="lives">Lives:</div>
+        </div>
+
+        <div id="info-menu" class="hidden">
+            <h2>HOW TO PLAY:</h2>
+                <p>Use ⬆️ ⬇️ ⬅️ ➡️ to control Pac-man</p>
+                <p>Keep the key down for smooth movement</p>
+                <p>Press <strong>"space"</strong> for pausing the game and to return back to the game</p>
+                <p>Ghosts are wandering around a while and then start chasing Pac-man</p>
+                <p>If Pac-man eats a power-pellet, ghosts become "scared" for 10 seconds</p>
+                <p>Scared ghosts will blink the last 3 seconds before returning to normal</p>
+                <p>Pac-man has to clear the whole gameboard from dots and pellets to win the game</p>
+                <p>If you run out of lives, game over</p>
+            <br>
+            <h2>SCORING:</h2>  
+                <p><strong>1 point </strong>for pac-dot</p>
+                <p><strong>10 points </strong>for power-pellet</p>
+                <p>Doubling points for scared ghosts eaten within 10 seconds:</p>
+                <ul>
+                    <li><strong>200 points </strong>for the first scared ghost eaten</li>
+                    <li><strong>400 points </strong>for the second</li>
+                    <li><strong>800 points </strong>for the third</li>
+                    <li><strong>1600 points </strong>for the fourth</li>
+                </ul>
+                <p><strong>NOTE:</strong> The points for scared ghosts reset to 200 when a power-pellet is eaten.</p>
+        </div>
+
+        <div id="pause-menu" class="hidden">
+            <h1>PAUSED</h1>
+            <p>Press Space to Resume</p>
+            <p>Press R to Restart</p>
+            <button id="resume-button">RESUME</button>
+            <button id="restart-button">RESTART</button>
+        </div>
+        
+        <div id="end-menu" class="hidden">
+            <h1 id="end-message"></h1>
+            <p  id="score-message"></p>
+            <p>Score: <span id ="final-score"></span></p>
+            <p>Time: <span id="final-time"></span></p>
+            <button id="play-again-button">PLAY AGAIN</button>
+        </div>
+
+    </body>
+
+    <footer>
+        <p>&copy; 2025 Fanni Vesanen & Maris Karu. All rights reserved.
+    </p>
+    </footer>
+
+    </html>

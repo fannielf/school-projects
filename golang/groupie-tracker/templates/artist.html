@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/assets/css/favicon.ico">
+    <title>{{.Name}}</title>
+    <link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+
+<body>
+    <section class="background-about">
+        <ul class="nav-bar">
+            <li><a href="/">Home</a></li>
+            <li><a href="/About">About Us</a></li>
+        </ul>
+        <h1>{{.Name}}</h1>
+
+        <!-- Image section -->
+        <div class="band-img">
+            <img id="artist-img" src="{{.Image}}" alt="{{.Name}}">
+        </div>
+        <!-- Band information -->
+        <div class="card-container1">
+            <details class="card">
+                <summary>Members</summary>
+
+                <b><ul>{{range .Members}}
+                    {{.}}<br><br>
+                    {{end}}
+                </ul>
+                </b>
+            </details>
+
+            <details class="card">
+                <summary>Created in</summary>
+                <b>
+                    <br>
+                    {{.CreationDate}}
+                </b>
+            </details>
+
+            <details class="card">
+                <summary>First Album</summary>
+                <b>
+                    <br>
+                    {{.FirstAlbum}}
+                </b>
+            </details>
+
+            <details class="card">
+                <summary>Concerts</summary>
+                <b>
+                    <ul>
+                        {{range $city, $dates := .Concerts}}
+                        <li>{{$city}}
+                            <ul>
+                                {{range $dates}}
+                                <li>{{.}}</li>
+                                {{end}}
+                            </ul>
+                        </li>
+                        <br>
+                        {{end}}
+                    </ul>
+                </b>
+            </details>
+
+            <details class="card">
+                <summary>Locations</summary>
+                <b> <ul>
+                    {{range .Location}}
+                    {{.}}<br><br>
+                    {{end}}
+                </ul>
+                </b>
+            </details>
+
+            <details class="card">
+                <summary>Dates</summary>
+                <b> <ul>
+                    {{range .Dates}}
+                    {{.}}<br><br>
+                    {{end}}
+                </ul>
+                </b>
+            </details>
+    </section>
+
+    </div>
+    
+</body>
+
+</html>
