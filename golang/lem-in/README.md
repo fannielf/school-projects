@@ -2,14 +2,15 @@
 
 This project is a digital version of an ant farm simulation.
 
-# Objectives
+## Objectives
+
 This project is meant to make you code a digital version of an ant farm.
 
 Create a program lem-in that will read from a file (describing the ants and the colony) given in the arguments.
 
 Upon successfully finding the quickest path, lem-in will display the content of the file passed as argument and each move the ants make from room to room.
 
-How does it work?
+## How does it work?
 
 You make an ant farm with tunnels and rooms.
 You place the ants on one side and look at how they find the exit.
@@ -27,23 +28,23 @@ the_links
 
 Lx-y Lz-w Lr-o ...
 
-# Usage:
+## Usage:
 
 Run the program with "go run . (filename)"
 if you want to see the time program takes to run simply add time in front of go run "time go run . (filename)"
 
-# Visual representations
+## Visual representations
 
 This image is showing what everything means in the example files.
 
 ![alt text](image.png)
 
-# Instructions
+## Instructions
 
 **Prerequisites:**
 
 Go installed on your system.
 
-# Authors:
+## Authors:
 
 Fanni, Roope & Toft

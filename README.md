@@ -9,7 +9,11 @@ First project I have ever coded! The project is simple low level code to learn h
 
 ### groupie-tracker
 
+An early web application project that consumes RESTful APIs to display artist and concert information. I learned a lot about JSON parsing, data linking, and error handling.
+
 ### lem-in
+
+A Go project simulating an ant farm that thought me the use of algorithms. The program reads a file describing ants, rooms, and tunnels, then finds the quickest way to move all ants from the start room to the end room.
 
 ## JavaScript
 
@@ -19,12 +23,16 @@ First javaScript project done during the first week of learning JS, done togethe
 
 ### make-your-game
 
+My first ever game: a single-player Pac-Man game built with plain JavaScript, HTML, and CSS. I learned smooth rendering for 60 FPS movement and algorithm usage for ghost AI.
+
 ### social-network
 
 This project started as a go-project for a simple forum and have been transforming since. First we had to add websockets for real time chat and in our JS-module it became our first time using frameworks (Next.js). As our last JS module project we (project group of 6 people) developed it even further into a facebook-like social platform with follow/unfollow functionality, groups (including events and group chats) and emoji support.
 
 ### bomberman-dom
 
+My second ever game, a real-time multiplayer Bomberman-style game with Twilight theme. Game was built using vanilla JavaScript and a Node.js Websocket. I got to test through golang module acquired Websocket skills in JS environment and have fun with the team building this game.
+
 ## Java
 
-Coming soon
+**Coming soon**
